@@ -78,10 +78,18 @@
 
 /* IOCTL Commands ***************************************************************************/
 
-#define SNIOC_ENABLESC     _SNIOC(0x0001) /* Arg: uint8_t value */
-#define SNIOC_READSC       _SNIOC(0x0002) /* Arg: int16_t* pointer */
-#define SNIOC_SETACCPM     _SNIOC(0x0003) /* Arg: uint8_t value */
-#define SNIOC_SETACCODR    _SNIOC(0x0004) /* Arg: uint8_t value */
+#define SNIOC_ENABLESC       _SNIOC(0x0001) /* Arg: uint8_t value */
+#define SNIOC_READSC         _SNIOC(0x0002) /* Arg: int16_t* pointer */
+#define SNIOC_SET_GYRO_RANGE _SNIOC(0x0003) /* Arg: BMI160_gyro_range_t */
+#define SNIOC_SET_OFFSET     _SNIOC(0x0004) /* Arg: struct *offset_s */
+
+typedef enum {
+    BMI160_GYRO_RANGE_2000 = 0x00,
+    BMI160_GYRO_RANGE_1000 = 0x01,
+    BMI160_GYRO_RANGE_500 = 0x02,
+    BMI160_GYRO_RANGE_250 = 0x03,
+    BMI160_GYRO_RANGE_125 = 0x04,
+} BMI160_gyro_range_t;
 
 /****************************************************************************
  * Public Types
@@ -108,6 +116,31 @@ struct accel_gyro_st_s
   struct gyro_t  gyro;
   struct accel_t accel;
   uint32_t sensor_time;
+};
+
+
+struct gyro_offset {
+    int8_t x;
+    int8_t y;
+    int8_t z;
+};
+
+struct accel_offset {
+    int8_t x;
+    int8_t y;
+    int8_t z;
+};
+
+#pragma pack(1)
+struct offset_s
+{
+    struct accel_offset accel;
+    struct gyro_offset gyro;
+    int8_t gyro_x_msb      : 2;
+    int8_t gyro_y_msb      : 2;
+    int8_t gyro_z_msb      : 2;
+    int8_t accel_offset_en : 1;
+    int8_t gyro_offset_en  : 1;
 };
 
 struct spi_dev_s;
