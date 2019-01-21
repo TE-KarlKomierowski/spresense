@@ -57,7 +57,7 @@
  ****************************************************************************/
 
 #define DEVID               0xd1
-#define BMI160_I2C_ADDR     0x68 /* If SDO pin is pulled to VDDIO, use 0x69 */
+#define BMI160_I2C_ADDR     0x68  /* If SDO pin is pulled to VDDIO, use 0x69 */
 #define BMI160_I2C_FREQ     400000
 
 #define BMI160_CHIP_ID          (0x00) /* Chip ID */
@@ -544,7 +544,7 @@ static void bmi160_set_normal_imu(FAR struct bmi160_dev_s* priv)
 
   bmi160_putreg8(priv, BMI160_ACCEL_CONFIG,
                  ACCEL_NORMAL_AVG4 | ACCEL_ODR_100HZ);
-  bmi160_putreg8(priv, BMI160_GYRO_CONFIG, GYRO_NORMAL_MODE | GYRO_ODR_100HZ);
+  bmi160_putreg8(priv, BMI160_GYRO_CONFIG, GYRO_NORMAL_MODE | GYRO_ODR_1600HZ);
 }
 
 /****************************************************************************
@@ -671,6 +671,36 @@ static int bmi160_ioctl(FAR struct file *filep, int cmd, unsigned long arg)
           *ptr = bmi160_getreg16(priv, BMI160_STEP_COUNT_0);
         }
         break;
+      case SNIOC_SET_GYRO_RANGE:
+        {
+            switch ((int)arg){
+                case 0x00:
+                case 0x01:
+                case 0x02:
+                case 0x03:
+                case 0x04:
+                    bmi160_putreg8(priv, BMI160_GYRO_RANGE, (int)arg);
+                    break;
+                default: /* Error, reserved value*/
+                    snerr("Reserved value: %d\n", (int)arg);
+                    ret = -ENOTTY;
+            }
+        }
+      break;
+      case SNIOC_SET_OFFSET:
+      {
+          uint8_t reg;
+          uint8_t *val_p;
+
+          if (!arg) return -EINVAL;
+          val_p = (void *) arg;
+
+            for (reg = 0; reg < sizeof(struct offset_s) ; reg++) {
+                bmi160_putreg8(priv, BMI160_OFFSET_0+reg, val_p[reg]);
+        }
+
+      }
+      break;
 
       default:
         snerr("Unrecognized cmd: %d\n", cmd);

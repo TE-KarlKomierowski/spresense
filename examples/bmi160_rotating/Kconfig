@@ -1,0 +1,38 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config EXAMPLES_BMI160_ROTATING
+	bool "Bosch BMI160 rotating demo"
+	default n
+	depends on BMI160
+	select CXD56_SPI
+	select CXD56_SPI4
+	select LCD
+	select LCD_ILI9340
+	select LCD_ILI9340_IFACE0
+	select CXD56_I2C
+	select CXD56_I2C0
+	---help---
+		Enable the Bosch BMI160 rotating demo
+
+if EXAMPLES_BMI160_ROTATING
+
+config EXAMPLES_BMI160_ROTATING_PROGNAME
+	string "Program name"
+	default "bmi160_rotating"
+	depends on BUILD_KERNEL
+	---help---
+		This is the name of the program that will be use when the NSH ELF
+		program is installed.
+
+config EXAMPLES_BMI160_ROTATING_PRIORITY
+	int "BMI160 rotating task priority"
+	default 100
+
+config EXAMPLES_BMI160_ROTATING_STACKSIZE
+	int "BMI160 rotating stack size"
+	default 2048
+
+endif
