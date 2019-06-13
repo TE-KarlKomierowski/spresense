@@ -4,11 +4,17 @@ FROM phusion/baseimage:0.11
 CMD ["/sbin/my_init"]
 
 RUN apt-get update
-RUN apt-get install -y git gperf libncurses5-dev flex bison genromfs vim-common gcc-arm-none-eabi wget bzip2 gcc make python3
-RUN apt-get install -y pkg-config autoconf automake cmake --install-recommends
-
-RUN git clone https://bitbucket.org/nuttx/tools.git
-RUN cd tools/kconfig-frontends/ && ./configure --disable-shared && make && make install
+RUN apt-get install -y wget clang-format 
+RUN wget https://raw.githubusercontent.com/sonydevworld/spresense/master/install-tools.sh
+RUN mkdir -p /spresenseenv/usr
+RUN bash -c 'echo "#!/bin/bash" > /usr/bin/sudo'
+RUN bash -c 'echo "\$@" >> /usr/bin/sudo' 
+RUN chmod +x /usr/bin/sudo
+RUN echo $HOME
+ENV HOME /
+RUN echo $HOME
+RUN bash  ./install-tools.sh
+ENV PATH "$PATH:/spresenseenv/usr/bin"
 RUN ldconfig
 
 # Clean up APT when done.
